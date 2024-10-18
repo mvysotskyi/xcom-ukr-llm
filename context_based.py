@@ -6,6 +6,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 if __name__ == "__main__":
     device = "cuda"
+    c = 0
 
     model = AutoModelForCausalLM.from_pretrained(
         "Qwen/Qwen2-1.5B-Instruct",
@@ -25,6 +26,7 @@ if __name__ == "__main__":
     ]
 
     def generate_response(topic, _):
+        global c
         messages[-1]["content"] = topic
 
         text = tokenizer.apply_chat_template(
@@ -45,6 +47,8 @@ if __name__ == "__main__":
         ]
 
         response = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
-        return response 
+
+        return response
+
 
     gr.ChatInterface(generate_response).launch()
