@@ -50,15 +50,16 @@ if __name__ == "__main__":
     model = AutoModelForCausalLM.from_pretrained("ukr_llm")
     tokenizer = AutoTokenizer.from_pretrained("mistralai/Mistral-7B-Instruct-v0.3")
 
-    messages_template = lambda title: [
-        {"role": "system", "content": "Imagine you are proukrainian activist. Be aggressive and biased, but do not start your messages with 'As a proukrainian activist ...'"},
+    messages_template = lambda title, body: [
+        {"role": "user", "content": f"{body}"},
+        {"role": "system", "content": "Imagine you are proukrainian activist. Be aggressive and biased, but do not start your messages with 'As a proukrainian activist ...'. Also use content above."},
         {"role": "user", "content": f"Title of news: {title}"}
     ]
 
     async def generate_response(url, _):
         article = await extract_article_content_from_url(url)
 
-        messages = messages_template(article["title"])
+        messages = messages_template(article["title"], article["body"])
 
         text = tokenizer.apply_chat_template(
             messages,
