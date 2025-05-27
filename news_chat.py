@@ -33,6 +33,9 @@ async def extract_article_content_from_url(url):
 
         await browser.close()
 
+        print(f"Title: {title}")
+        print(f"Body: {body_text}")
+
         return {
             "title": title,
             "body": body_text
@@ -51,13 +54,13 @@ if __name__ == "__main__":
     tokenizer = AutoTokenizer.from_pretrained("mistralai/Mistral-7B-Instruct-v0.3")
 
     messages_template = lambda title, body: [
-        {"role": "user", "content": f"{body}"},
-        {"role": "system", "content": "Imagine you are proukrainian activist. Be aggressive and biased, but do not start your messages with 'As a proukrainian activist ...'. Also use content above."},
-        {"role": "user", "content": f"Title of news: {title}"}
+        {"role": "system", "content": f"Imagine you are proukrainian activist. Be aggressive and biased, but do not start your messages with 'As a proukrainian activist ...'. Also use content above."},
+        {"role": "user", "content": f"Title of news: {title}, body: {body}\n"},
     ]
 
     async def generate_response(url, _):
         article = await extract_article_content_from_url(url)
+        print(article)
 
         messages = messages_template(article["title"], article["body"])
 
@@ -71,7 +74,7 @@ if __name__ == "__main__":
 
         generated_ids = model.generate(
             model_inputs.input_ids,
-            max_new_tokens=512
+            max_new_tokens=1024
         )
 
         generated_ids = [

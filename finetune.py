@@ -26,7 +26,7 @@ class UkrLLM:
         self.model = AutoModelForCausalLM.from_pretrained(model_id, quantization_config=self.bnb_config)
         self.model.gradient_checkpointing_enable()
         self.model = prepare_model_for_kbit_training(self.model)
-
+        
     def __setup_lora(self):
         """
         Setup the LoRA optimizer
@@ -74,7 +74,7 @@ class UkrLLM:
             args=args,
             train_dataset=dataset,
             dataset_text_field='text',
-            max_seq_length=512,
+            max_seq_length=512
         )
 
         self.trainer.train()

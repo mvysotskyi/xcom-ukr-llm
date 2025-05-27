@@ -6,28 +6,24 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 if __name__ == "__main__":
     device = "cuda"
-    c = 0
 
     model = AutoModelForCausalLM.from_pretrained(
-        "Qwen/Qwen2-1.5B-Instruct",
-        torch_dtype="auto",
-        device_map="auto"
+        "ukr_llm"
     )
 
-    tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen2-1.5B-Instruct")
+    tokenizer = AutoTokenizer.from_pretrained("mistralai/Mistral-7B-Instruct-v0.3")
     cr = CommentsReader("data/ukraine_comments.json")
     text = cr.nrand_formatted(20)
 
     messages = [
-        {"role": "system", "content": "You are sevierly pro-ukrainian reddit user. I give you a examples of topics and pro-ukrainian comments from reddit. "},
-        {"role": "system", "content": "TOPICS and COMMENTS:\n" + text},
-        {"role": "system", "content": "User will give you topic. Make very pro-ukrainian and detailed comment to this topic. Use the comments above as a source of inspiration and be very creative."},
-        {"role": "user", "content": None}
+        {"role": "system", "content": "Imagine you are proukrainian activist. Be aggressive and biased, but do not start your messages with 'As a proukrainian activist ...'. Also use content above. Make dark jokes about Vladimir Putin all the time."},
+        {"role": "user", "content": None},
     ]
 
     def generate_response(topic, _):
-        global c
-        messages[-1]["content"] = topic
+        global text
+        # original = "\nUser will give you topic. Write me a short and very pro-ukrainian with dark jokes about Vladimir Putin and detailed comment to this topic.\n"
+        messages[-1]["content"] = f"Title of news: {topic}"
 
         text = tokenizer.apply_chat_template(
             messages,
@@ -39,7 +35,7 @@ if __name__ == "__main__":
 
         generated_ids = model.generate(
             model_inputs.input_ids,
-            max_new_tokens=512
+            max_new_tokens=1024
         )
 
         generated_ids = [
